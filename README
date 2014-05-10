@@ -1,0 +1,8 @@
+
+Recordset - management of MySQL queries for PHP
+
+Minimal class for CRUD functionality. Supports insert, select, update, delete and replace. 
+Included are classes for column representation. 
+
+Terence Lein
+tlein@optonline.net

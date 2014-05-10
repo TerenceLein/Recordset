@@ -1,0 +1,296 @@
+<html>
+	<head>
+		<style>
+			body {font-family: Verdana;}
+			table {border-collapse: collapse;}
+			table.attributes, table.methods {border: thin solid gray;}
+			td.attributes, td.methods {border: thin solid lightgray;}
+			td.name {width: 150;}
+		</style>
+	</head>
+	<body>
+		<h2>Recordset Classes</h2>
+		<p>
+ A set of classes to reduce the amount of coding needed for building and
+ executing queries.<br><br>
+ 
+ The Recordset class uses a Column class to define a field in the row/record.
+ Additional classes are derived from Column: Decimal, DateStamp, LongDateTime,
+ Password, ReadOnly, Reference, ShortDate, SubQuery.<br><br>
+ 
+ To use: create an instance of Recordset, set its table property with the name 
+ of the table to query and add instances of Column to it. Or, derive a new 
+ class from Recordset and in its constructor set the table name and add the 
+ columns. Then create an instance to use. This approach has the advantage of 
+ allowing the addition of attributes and methods.<br><br>
+ Queries constructed by the recordset will contain these columns in their field
+ lists in the order added. All columns of a table need not be represented but 
+ Insert and Update queries without columns that must not be null could result in 
+ an exception from MySQL.<br><br>
+ 
+ TODO: Recordset uses the mysql interface which is deprecated. It needs to be converted to the
+ mysqli interface.<br><br><br>
+		</p>
+		<hr>
+		<h3>Classes</h3>
+		<table>
+			<tr><td><a href="#Column">Column</a></td><td>Base Class for all Column types</td></tr>
+			<tr><td><a href="#DateColumn">DateColumn</a></td><td>Base Class for Date Column types</td></tr>
+			<tr><td><a href="#DateStamp">DateStamp</a></td><td>Generate a Date-Time Stamp </td></tr>
+			<tr><td><a href="#Decimal">Decimal</a></td><td>Integer Columns</td></tr>
+			<tr><td><a href="#LongDateTime">LongDateTime</a></td><td>YYYY-MM-DD HH:MM:SS Columns</td></tr>
+			<tr><td><a href="#Password">Password</a></td><td>Password Columns (value encrypted)</td></tr>
+			<tr><td><a href="#ReadOnly">ReadOnly</a></td><td>Read Only Columns (updates bypassed)</td></tr>
+			<tr><td><a href="#Reference">Reference</a></td><td>Lines of Reerence</td></tr>
+			<tr><td><a href="#ShortDate">ShortDate</a></td><td>MM/DD/YY Columns</td></tr>
+			<tr><td><a href="#SubQuery">SubQuery</a></td><td>Columns with MySQL sub-queries</td></tr>
+			<tr><td></td><td></td></tr>
+			<tr><td><a href="#Recordset">Recordset</a></td><td>Manage database queries</td></tr>
+		</table>
+		<hr>
+		<div id="Column"><h3>Column</h3>
+			<p>Provides base functionality for all columns. </p>
+			<b>Attributes</b><br>
+			<table class="attributes">
+				<tr id="field"><td class="attributes name">field</td><td class="attributes">column name</td></tr>
+				<tr id="name"><td class="attributes name">name</td><td class="attributes">alias</td></tr>
+			</table>
+			<br>
+			<b>Methods</b><br>
+			<table class="methods">
+				<tr><td class="methods name">__construct</td><td class="methods"><i>((string)field[,(string)name])</i><br>
+						constructor</td></tr>
+				<tr><td class="methods name">Format</td><td class="methods"><i>((string)data)</i><br>
+						returns 'data' for display by the browser (i.e. no formatting)</td></tr>
+				<tr><td class="methods name">GetName</td><td class="methods"><i>()</i><br>
+						returns the column alias or the column name if there is no alias</td></tr>
+				<tr><td class="methods name">Parse</td><td class="methods"><i>((string)data)</i><br>
+						Parses user entered data into a form usable by the script. Returns 'data' (i.e. no parsing)</i></td></tr>
+				<tr><td class="methods name">Prepare</td><td class="methods"><i>((string)data)</i><br>
+						Prepares data for update or insertion. Returns escaped 'data'.</td></tr>
+				<tr id="Validate"><td class="methods name">Validate</td><td class="methods"><i>((mixed)data)</i><br>
+						Validates data. Does not generate any errors.</td></tr>
+			</table>
+		</div>
+		<hr>
+		<div id="DateStamp"><h3>DateStamp</h3>
+			<p>Extended from 'ReadOnly'. </p>
+			<b>Methods</b><br>
+			<table class="methods">
+				<tr><td class="methods name">DateStamp</td><td class="methods"><i>((string)field[,(string)name])</i><br>
+						constructor</td></tr>
+				<tr><td class="methods name">Format</td><td class="methods"><i>((string)date)</i><br>
+						returns 'date' in the form YYYY-MM-DD.</td></tr>
+			</table>
+		</div>
+		<hr>
+		<div id="Decimal"><h3>Decimal</h3>
+			<p>Extended from Column. A column containing only numeric data.</p>
+			<b>Attributes</b><br>
+			<table class="attributes">
+				<tr><td class="attributes name">decimals</td><td class="attributes">number of decimal places</td></tr>
+			</table>
+			<br>
+			<b>Methods</b><br>
+			<table class="methods">
+				<tr><td class="methods name">__construct</td><td class="methods"><i>(field[,decimals=0,name=''])</i><br>
+						constructor</td></tr>
+				<tr><td class="methods name">Validate</td><td class="methods"><i>(data)</i><br>
+						Generates an error message if 'data' is not a valid decimal number.</td></tr>
+			</table>
+		</div>
+		<hr>
+		<div id="LongDateTime"><h3>LongDateTime</h3>
+			<p>Extended from Column. Manages a DATETIME column.</p>
+			<b>Attributes</b><br>
+			<table class="attributes">
+				<tr><td class="attributes name">label</td><td class="attributes">label</td></tr>
+			</table>
+			<br>
+			<b>Methods</b><br>
+			<table class="methods">
+				<tr><td class="methods name">__construct</td><td class="methods"><i>(field[,name='',label=''])</i><br>
+						constructor</td></tr>
+				<tr><td class="methods name">Format</td><td class="methods"><i>(date,tz=false)</i><br>
+						returns 'date' in the form YYYY-MM-DD HH:MM:SS. The time zone is appended if 'tz' is true.</td></tr>
+				<tr><td class="methods name">Prepare</td><td class="methods"><i>()</i><br>
+						returns 'date' in the form YYYY-MM-DD HH:MM:SS in the UTC time zone.</td></tr>
+				<tr><td class="methods name">Validate</td><td class="methods"><i>(date)</i><br>
+						Generates one or more warnings or error messages if 'date' is not valid. ('date' is optional.)</i></td></tr>
+				<tr><td class="methods name">getLongDate</td><td class="methods"><i>(date)</i><br>
+						Returns 'date' in the form YYYY-MM-DD.</td></tr>
+				<tr><td class="methods name">getShortDate</td><td class="methods"><i>(data)</i><br>
+						Returns 'date' in the form MM/DD/YY.</td></tr>
+				<tr><td class="methods name">getTime</td><td class="methods"><i>(data)</i><br>
+						Returns the time portion of 'date' in the form HH:MM:SS.</td></tr>
+			</table>
+		</div>
+		<hr>
+		<div id="Password"><h3>Password</h3>
+			<p>Extends <a href="#Column">Column</a>. A column that is intended to contain a password. It will
+				not be displayed. It is stored in the table as a one-way seeded hash.</p>
+			<br>
+			<b>Methods</b><br>
+			<table class="methods">
+				<tr><td class="methods name">Format</td><td class="methods"><i>((string)data)</i><br>
+						returns '********' for display by the browser</td></tr>
+				<tr><td class="methods name">Prepare</td><td class="methods"><i>((string)data)</i><br>
+						Prepares data for update or insertion. Returns a hashed <b>data</b>.</td></tr>
+			</table>
+		</div>
+		<hr>
+		<div id="ReadOnly"><h3>ReadOnly</h3>
+			<p>Extends <a href="#Column">Column</a>. A basic column that is never included in an insert or update. </p>
+			<br>
+		</div>
+		<hr>
+		<div id="Reference"><h3>Reference</h3>
+			<p>Extended from <a href="#Column">Column</a>. Manages an array of reference lines. The lines are stored in the column
+					separated by '\n' characters.</p>
+			<b>Attributes</b><br>
+			<table class="attributes">
+				<tr><td class="attributes name">linesize</td><td class="attributes">linesize<br>
+								default value of 35 characters</td></tr>
+				<tr><td class="attributes name">maxlines</td><td class="attributes">maxlines<br>
+								Default value of 0 lines. Maxlines must be set either in the constructor or directly.</td></tr>
+			</table>
+			<br>
+			<b>Methods</b><br>
+			<table class="methods">
+				<tr><td class="methods name">__construct</td>
+						<td class="methods"><i>((string)field[,(integer)maxlines=0[,(string)name='']])</i><br>
+									constructor</td></tr>
+				<tr><td class="methods name">Format</td><td class="methods"><i>((string)data)</i><br>
+						Replaces '<returns the reference with the '\n' characters replaced by '<br>'.</td></tr>
+				<tr><td class="methods name">Prepare</td><td class="methods"><i>((string)data)</i><br>
+						Trims each line; removes blank lines; replaces '<br>' with '\n'; returns escaped data.</td></tr>
+				<tr><td class="methods name">Validate</td><td class="methods"><i>((string)data)</i><br>
+						Generates an error if any line exceeds maximum length. 
+						Generates an error if the number of lines exceeds the maximum.</td></tr>
+			</table>
+		</div>
+		<hr>
+		<div id="ShortDate"><h3>ShortDate</h3></div>
+		<hr>
+		<div id="SubQuery"><h3>SubQuery</h3>
+			<p>Extends <a href="#ReadOnly">ReadOnly</a>. A column that contains a sub-query. It is not a true 
+						column found in the table. It requires a field alias; it is never included in an insert or
+						update. </p>
+			<br>
+			<b>Methods</b><br>
+			<table class="methods">
+				<tr><td class="methods name">__construct</td><td class="methods"><i>((string)sub-query,(string)name)</i><br>
+						constructor</td></tr>
+			</table>
+		</div>
+		<hr>
+		<div id="Recordset"><h3>Recordset</h3>
+			<p>A class that manages insert, browse, update, and delete queries. The query operates on the 
+						currently connected server and selected database. A recordset object is not associated with a table 
+						and has no columns. Set the <a href="#table"><b>table</b></a> attribute and add columns 
+						using the <a href="#AddColumn"><b>AddColumn</b></a> method. Or you can derived a new class 
+						from Recordset and set the table and add columns in its constructor after calling the parent 
+						constructor.</p>
+			<br>
+			<b>Attributes</b><br>
+			<table class="attributes">
+				<tr><td class="attributes name">cols</td><td class="attributes"><i>object array</i><br>
+						A collection of Column objects.</td></tr>
+				<tr id="count"><td class="attributes name">count</td><td class="attributes"><i>integer</i><br>
+						The count of rows returned by <a href="#Select"><b>Select</b></a> when limiting the
+						range and number of row in the query. If used in a limit clause, default is 25.</td></tr>
+				<tr id="join"><td class="attributes name">join</td><td class="attributes"><i>string</i><br>
+						This string will complete a left join for a <a href="#Select"><b>Select</b></a> query. 
+						It should consist of a table name followed by an "on" clause. Exclude the "left join" keywords. 
+						Other joins can be appended using the "join" keywords. It has no effect on other queries. 
+						Default is null and no join will be made. Recordsets with joins cannot be used for 
+						modifications</td></tr>
+				<tr><td class="attributes name">limit</td><td class="attributes"><i>[offset,] count</i><br>
+						Used to limit the range of a <a href="#Select"><b>Select</b></a> query. Use the SQL syntax 
+						for the limit clause without the key words. </td></tr>
+				<tr id="order"><td class="attributes name">order</td><td class="attributes"><i>col [asc|desc][,col [asc|desc]] ...</i><br>
+						The sort order of the <a href="#Select"><b>Select</b></a> result set. Use the SQL syntax 
+						without the key words. </td></tr>
+				<tr><td class="attributes name">rows</td><td class="attributes"><i>mixed array</i><br>
+						The result set of a <a href="#Select"><b>Select</b></a>. </td></tr>
+				<tr id="start"><td class="attributes name">start</td><td class="attributes"><i>[integer=0]</i><br>
+						Together with <a href="#count"><b>count</b></a> used as the offset in the limit clause 
+						of a <a href="#Select"><b>Select</b></a> to restrict the range of the returned set. </td></tr>
+				<tr><td class="attributes name">table</td><td class="attributes"><i>name [, name] ...</i><br>
+						The database table name. The multiple table form can only be used in a <a href="#Select"><b>Select</b></a>. 
+						 </td></tr>
+				<tr id="wasUpdated"><td class="attributes name">wasUpdated</td><td class="attributes"><i>boolean</i><br>
+						True if the last <a href="#Delete"><b>Delete</b></a>, <a href="#Update"><b>Update</b></a>, or  
+						<a href="#Insert"><b>Insert</b></a> was successful. </td></tr>
+				<tr id="where"><td class="attributes name">where</td><td class="attributes"><i>string</i><br>
+						Selection criteria for  <a href="#Delete"><b>Delete</b></a>, <a href="#Select"><b>Select</b></a>, 
+						and <a href="#Update"><b>Update</b></a>. Use the SQL syntax for the "where" clause without the
+						 keyword. </td></tr>
+			</table>
+			<br>
+			<b>Methods</b><br>
+			<table class="methods">
+				<tr><td class="methods name">__construct</td><td class="methods"><i>([(mixed array)rows=null])</i><br>
+						constructor. Optionally it can specify an array of rows to initialize the row set. </td></tr>
+				<tr><td class="methods name">AddColumn</td><td class="methods"><i>((object)column)</i><br>
+						Adds a column to the record set's collection. Field lists for <a href="#Insert"><b>Insert</b></a>, 
+						<a href="#Select"><b>Select</b></a>, and <a href="#Update"><b>Update</b></a> are created in the
+						order in which columns are added. </td></tr>
+				<tr><td class="methods name">AppendBlankRows</td><td class="methods"><i>((integer)count)</i><br>
+						Appends the <i>count</i> number of blank rows to the record set's collection. </td></tr>
+				<tr><td class="methods name">Begin</td><td class="methods"><i>(void)</i><br>
+						Begins a transactions. </td></tr>
+				<tr><td class="methods name">Commit</td><td class="methods"><i>(void)</i><br>
+						Commits a transactions. </td></tr>
+				<tr><td class="methods name">CompareRows</td><td class="methods"><i>((row)A, (row)B)</i><br>
+						Compares row A to B. Rows are associative arrays. Returns true if fields in B are equal to
+						the corresponding fields in A. </td></tr>
+				<tr id="Delete"><td class="methods name">Delete</td><td class="methods"><i>((string)id)</i><br>
+						Deletes rows that correspond to <i>id</i> which has the form of a SQL "where" clause without
+						the keyword. Returns true if the Delete succeeded.</td></tr>
+				<tr><td class="methods name">GetCount</td><td class="methods"><i>(void)</i><br>
+						Returns the number of rows in the record set.</td></tr>
+				<tr><td class="methods name">GetMaximumValue</td><td class="methods"><i>((string)column name)</i><br>
+						Returns the maximum value of a column in the record set's table. Operates on the full set
+						of rows in the table.</td></tr>
+				<tr><td class="methods name">HasChanged</td><td class="methods"><i>((array)row)</i><br>
+						Returns true if the given row has been changed. </td></tr>
+				<tr id="Insert"><td class="methods name">Insert</td><td class="methods"><i>((array)row)</i><br>
+						Inserts the given row into the table. Returns the new ID of the row if auto-generated. 
+						Returns false if the insert was unsuccessful. </td></tr>
+				<tr><td class="methods name">IsJoin</td><td class="methods"><i>(void)</i><br>
+						Returns true if the record set contains a table join. </td></tr>
+				<tr><td class="methods name">Query</td><td class="methods"><i>((string)query)</i><br>
+						Executes the "query". Returns true if the query was successful. </td></tr>
+				<tr id="Select"><td class="methods name">Select</td><td class="methods"><i>(void)</i><br>
+						Builds and executes a Select query. Returns the first row of the set if the query was successful. 
+						Return false if there are no rows in the set.</td></tr>
+				<tr><td class="methods name">SetFieldByName</td><td class="methods"><i>((string)field,(string)name)</i><br>
+						Sets the "<a href="#field">field</a>" property of a column with the "<a href="#name">name</a>" 
+						property. Does not return a value.</td></tr>
+				<tr><td class="methods name">SetFilter</td><td class="methods"><i>((string)filter)</i><br>
+						Sets the "<a href="#where">where</a>" property of a recordset with "filter". Does not return 
+						a value.</td></tr>
+				<tr><td class="methods name">SetJoin</td><td class="methods"><i>((string)join)</i><br>
+						Sets the "<a href="#join">join</a>" property of a recordset with "join". Does not return 
+						a value.</td></tr>
+				<tr><td class="methods name">SetRange</td><td class="methods"><i>([(integer)offset[,(integer)count]])</i><br>
+						Sets the "<a href="#start">start</a>" property of a recordset with "offset" and the 
+						"<a href="#count">count</a>". Default "offset" is 0 and default "count" is 25. But the returned
+						record set of a <a href="#Select">Select</a> is only limited when this method is used. Otherwise
+						the full set is returned. The method does not return a value. </td></tr>
+				<tr><td class="methods name">SetSort</td><td class="methods"><i>((string)sort)</i><br>
+						Sets the "<a href="#order">order</a>" property of a recordset with "sort". The method 
+						does not return a value. </td></tr>
+				<tr id="Update"><td class="methods name">Update</td><td class="methods"><i>((array)row,(string)id)</i><br>
+						Updates the row identified by "id" with the contents of "row". The <a href="#wasUpdated">wasUpdated</a> 
+						property is set to true if any column is updated. False if no columns are updated.</td></tr>
+				<tr><td class="methods name">Validate</td><td class="methods"><i>((array)row)</i><br>
+						Validates the data in "row". Executes the <a href="Validate">Validate</a> method of each 
+						column in the recordset. Returns true if no errors were generated by any column.</td></tr>
+				<tr><td class="methods name">WasUpdated</td><td class="methods"><i>(void)</i><br>
+						Returns the wasUpdated property of the recordset. </td></tr>
+			</table>
+		</div>
+	</body>	
+</html>
